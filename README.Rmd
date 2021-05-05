@@ -1,0 +1,132 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
+```{r, echo = FALSE}
+library(knitr)
+
+opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+
+# DexterMST
+
+DexterMST is an R package acting as a companion to dexter and adding facilities to manage and analyze data from  multistage tests (MST). It includes functions for importing and managing test data, assessing and improving the quality of data through basic test and item analysis, and fitting an IRT model, all adapted to the peculiarities of MST designs. DexterMST typically works with project database files saved on disk. 
+
+## Installation
+
+```{r, eval=FALSE}
+install.packages('dexterMST')
+```
+
+If you encounter a bug, please post a minimal reproducible example on [github](https://github.com/jessekps/dexter/issues). We post news and examples on a [blog](https://dexterities.netlify.app/), it's also the place for general questions.
+
+## Example
+
+Here is an example for a simple two-stage test.
+```{r, results='hide', message=FALSE}
+library(dexterMST)
+library(dplyr)
+# start a project
+db = create_mst_project(":memory:")
+
+items = data.frame(item_id=sprintf("item%02i",1:70), item_score=1, delta=sort(runif(70,-1,1)))
+
+design = data.frame(item_id=sprintf("item%02i",1:70),
+                    module_id=rep(c('M4','M2','M5','M1','M6','M3', 'M7'),each=10))
+
+routing_rules = routing_rules = mst_rules(
+ `124` = M1[0:5] --+ M2[0:10] --+ M4, 
+ `125` = M1[0:5] --+ M2[11:15] --+ M5,
+ `136` = M1[6:10] --+ M3[6:15] --+ M6,
+ `137` = M1[6:10] --+ M3[16:20] --+ M7)
+
+
+scoring_rules = data.frame(
+  item_id = rep(items$item_id,2), 
+  item_score= rep(0:1,each=nrow(items)),
+  response= rep(0:1,each=nrow(items))) # dummy respons
+  
+
+db = create_mst_project(":memory:")
+add_scoring_rules_mst(db, scoring_rules)
+
+create_mst_test(db,
+                test_design = design,
+                routing_rules = routing_rules,
+                test_id = 'sim_test',
+                routing = "all")
+```
+
+We can now plot the design
+
+```{r, eval=FALSE}
+# plot test designs for all tests in the project
+design_plot(db)
+```
+
+We now simulate data:
+```{r, results='hide', message=FALSE}
+theta = rnorm(3000)
+
+dat = sim_mst(items, theta, design, routing_rules,'all')
+dat$test_id='sim_test'
+dat$response=dat$item_score
+
+add_response_data_mst(db, dat)
+```
+
+
+```{r, results='hide'}
+# IRT, extended nominal response model
+f = fit_enorm_mst(db)
+
+head(f)
+```
+
+```{r, echo=FALSE}
+kable(head(coef(f)))
+```
+
+```{r, results='hide'}
+# ability estimates per person
+rsp_data = get_responses_mst(db)
+abl = ability(rsp_data, parms = f)
+head(abl)
+```
+
+```{r, echo=FALSE}
+kable(head(abl))
+```
+
+```{r, results='hide'}
+# ability estimates without item Item01
+abl2 = ability(rsp_data, parms = f, item_id != "item01")
+
+# plausible values
+pv = plausible_values(rsp_data, parms = f, nPV = 5)
+head(pv)
+```
+
+```{r, echo=FALSE}
+kable(head(pv))
+```
+
+
+```{r, include=FALSE}
+close_mst_project(db)
+```
+## Contributing
+
+Contributions are welcome but please check with us first about what you would like to contribute.
+
+

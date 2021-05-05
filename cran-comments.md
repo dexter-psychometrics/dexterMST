@@ -1,0 +1,1 @@
+This fixes the conditional dependency in the vignette as requested by prof. Brian Ripley. 

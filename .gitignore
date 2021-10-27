@@ -3,7 +3,7 @@
 .RData
 .Ruserdata
 .Rproj
-.o
-.dll
-.so
+*.o
+*.dll
+*.so
 CRAN-RELEASE

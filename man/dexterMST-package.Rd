@@ -25,8 +25,8 @@ To learn more about dexterMST, start with the vignette: `vignette('dexterMST',pa
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://dexterities.netlify.app/}
-  \item Report bugs at \url{https://github.com/jessekps/dexter/issues}
+  \item \url{https://dexter-psychometrics.github.io/dexter}
+  \item Report bugs at \url{https://github.com/dexter-psychometrics/dexter/issues}
 }
 
 }

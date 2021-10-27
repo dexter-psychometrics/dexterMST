@@ -505,7 +505,7 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 
 
 // to do: possible scores (in range)
-// to do: void may be slightly faster
+// to do: make things parallel
 //[[Rcpp::export]]
 arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::vec& c, 
              arma::ivec& first, arma::ivec& last, 
@@ -522,35 +522,37 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 	  
 	mat pi(npar, nscores, fill::zeros);	  
  
-		std::vector<long double> g(nscores), gi(nscores);
-		vec eta(npar);
+	std::vector<long double> g(nscores), gi(nscores);
+	vec eta(npar);
 
-		for (int s = bmin; s <= bmax; s++)
-		{
-			//if(ps[s] == 1)
-			//{
-				int k = 0; 
-				eta = exp(logb + s * alogc);
+	for (int s = bmin; s <= bmax; s++)
+	{
+		//if(ps[s] == 1)
+		//{
+			int k = 0; 
+			eta = exp(logb + s * alogc);
 
-				elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
-						mod_min.memptr(), mod_max.memptr(), nmod,
-						mnit.memptr(), g);
-
-				for (int it = 0; it < nI; it++)
+			elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
+					mod_min.memptr(), mod_max.memptr(), nmod,
+					mnit.memptr(), g);
+			
+			for (int it = 0; it < nI; it++)
+			{
+				for (int j = first[it]; j <= last[it]; j++) 
 				{
-					for (int j = first[it]; j <= last[it]; j++) 
+					elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
+							mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
+					indx = s-a[j];
+					if ( indx >= 0 && indx < (nscores - a[last[it]])) 
 					{
-						elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
-								mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
-						indx = s-a[j];
-						if ( indx >= 0 && indx < (nscores - a[last[it]])) 
-							//pi.at(k,s) = exp(log(eta[j]) + log(gi[indx]) - log(g[s]));
-							pi.at(k,s) = eta[j] * gi[indx]/g[s];
-						k++;
+						//pi.at(k,s) = exp(log(eta[j]) + log(gi[indx]) - log(g[s]));
+						pi.at(k,s) = eta[j] * gi[indx]/g[s];
 					}
+					k++;
 				}
-			//}
-		}
+			}
+		//}
+	}
 	return pi;
 }
 

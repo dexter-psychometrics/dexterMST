@@ -12,9 +12,9 @@ a data.frame with columns item_id, item_score, beta or a dexter or dexterMST par
 
 \item{theta}{vector of person abilities}
 
-\item{test_design}{data.frame with columns item_id, module_id, item_position}
+\item{test_design}{data.frame with columns item_id, module_id}
 
-\item{routing_rules}{output pf \code{\link{mst_rules}}}
+\item{routing_rules}{output of \code{\link{mst_rules}}}
 
 \item{routing}{'all' or 'last' routing}
 }

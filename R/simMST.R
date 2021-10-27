@@ -10,8 +10,8 @@
 #' @param pars item parameters, can be either: 
 #' a data.frame with columns item_id, item_score, beta or a dexter or dexterMST parameters object
 #' @param theta vector of person abilities
-#' @param test_design data.frame with columns item_id, module_id, item_position
-#' @param routing_rules output pf \code{\link{mst_rules}}
+#' @param test_design data.frame with columns item_id, module_id
+#' @param routing_rules output of \code{\link{mst_rules}}
 #' @param routing 'all' or 'last' routing
 #' 
 #' 

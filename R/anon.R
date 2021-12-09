@@ -105,8 +105,7 @@ Calibrate_MST = function(first, last, a, sufI, scoretab, booklets, design, modul
     converged=FALSE
     iter = 0
     pb = txtProgressBar(min=0, max=nIter) 
-    #plot(c(0,500),c(sum(sufI)-300,sum(sufI)+300),type='n',xlab='iteratie EM',ylab='sum EsufI')
-    #abline(h=sum(sufI))
+
     while ((!converged) && (iter<=nIter))
     {
       iter = iter + 1
@@ -115,17 +114,11 @@ Calibrate_MST = function(first, last, a, sufI, scoretab, booklets, design, modul
              booklets$max_score, booklets$nmod, booklets$routing,
              modules$nit, modules$module_exit_score_min, modules$module_exit_score_max,
              scoretab$N, EsufI)
-      #points(iter,sum(EsufI))
-      # plot(sufI,EsufI)
-      # abline(0,1)
-      # plot(sufI-EsufI)
-      # abline(h=0)
-      # browser()
+
 
       b = b*sufI/EsufI
       converged = ((max(abs(sufI-EsufI))/nn) < 1e-05)
       setTxtProgressBar(pb, value=iter)
-  
     }
     # identify
     b = b/(b[ref_cat]^(a/a[ref_cat]))
@@ -272,8 +265,9 @@ Calibrate_Bayes_MST = function(first, last, a, sufI, scoretab, booklets, design,
 # @param sufC: <sum(item_score * booklet_score)>
 # @param nIter: max number of iterations
 
-Estim_MST <-function(a, first, last, min_scores, max_scores, sufI, sufC, scoretab, routing)
+Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoretab, routing)
 {
+
   # to~do: different inputs more like enorm, than this pre-amble can be omitted
   cfirst = as.integer(unlist(first)-1L)
   clast = as.integer(unlist(last)-1L)
@@ -319,13 +313,14 @@ Estim_MST <-function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   iter=1
   while (converged>0.001)
   {
+    print(paste('RM',iter))
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
                           mnit, min_scores, max_scores)
     EsufI=pi_mat%*%scoretab 
     b=b*sufI/EsufI
     converged=(max(abs(sufI-EsufI))/mm)
     # to do: this is temporary debugging
-    if(any(pi_mat>1+1e-15)) browser()
+    #if(any(pi_mat>1+1e-15)) browser()
     iter = iter + 1
   }
   
@@ -335,6 +330,7 @@ Estim_MST <-function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   while(converged>0.0001)
   {
     converged=-1
+    print(paste('RM NR',iter))
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
                           mnit, min_scores, max_scores)
     pi_mat[is.na(pi_mat)]=0
@@ -371,8 +367,9 @@ Estim_MST <-function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   
   while(converged>0.001)
   {
+    iter=iter+1
     converged=-1
-    
+    print(paste('IM',iter))
     tel_ic=1
     for (m in 1:nMod)
     {

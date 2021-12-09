@@ -6,7 +6,26 @@
 
 using namespace arma;
 
+mat mat_init(const mat& orig)
+{
+	return mat(orig.n_rows, orig.n_cols, fill::zeros);
+}
 
+vec vec_init(const vec& orig)
+{
+	return vec(orig.n_elem, fill::zeros);
+}
+
+
+#pragma omp declare reduction( + : arma::mat : omp_out += omp_in ) \
+initializer( omp_priv = mat_init(omp_orig) )
+
+#pragma omp declare reduction( + : arma::vec : omp_out += omp_in ) \
+initializer( omp_priv = vec_init(omp_orig) )
+
+
+
+/*
 template< class T>
 void print_vec(const std::vector<T>& v)
 {
@@ -26,7 +45,7 @@ void print_vec(const std::vector<T>& v)
 	printf("\n");
 	fflush(stdout);
 }
-
+*/
 
 
 int elsym(const int routing, const vec& b, const ivec& a, 
@@ -223,9 +242,9 @@ void Expect( const arma::vec& b, const arma::ivec& a,
 			for(int j=bfirst[i]; j<= blast[i]; j++)
 			{
 			  elsym(brouting[bi], b, a, bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
-           mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
-            mnit.memptr() + cbmod[bi],  gi, bfirst[i], a[j]);
-			  
+					mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
+					mnit.memptr() + cbmod[bi],  gi, bfirst[i], a[j]);
+				  
 				for (int s = a[j]; s <= bmax[bi]; s++) 
 				{
 				  if(g[s]>0)
@@ -239,7 +258,6 @@ void Expect( const arma::vec& b, const arma::ivec& a,
 
 }
 
-
 // [[Rcpp::export]]
 void NR( const arma::vec& b, const arma::ivec& a, 
              arma::ivec& bfirst, arma::ivec& blast, const arma::ivec& bmax,
@@ -249,7 +267,6 @@ void NR( const arma::vec& b, const arma::ivec& a,
 {
 	const int nb = nmod.n_elem;
 	const int len_g = max(bmax) + 1;// if crashes + maxa
-	double tmp;
 	
 	// bookkeeping
 	ivec cbmax(nb+1), bnit(nb, fill::zeros), cbnit(nb+1), cbmod(nb+1);
@@ -268,79 +285,82 @@ void NR( const arma::vec& b, const arma::ivec& a,
 	
 	E.zeros();
 	H.zeros();
-	std::vector<long double> g(len_g), gi(len_g), gk(len_g), gik(len_g);
-	vec cc(len_g, fill::zeros);
-		
-	for(int bi=0; bi<nb; bi++)
+#pragma omp parallel
 	{
-		elsym(brouting[bi],b, a, bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
-				mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
-				mnit.memptr() + cbmod[bi], g);
-
-		for(int i=cbnit[bi]; i<cbnit[bi+1]; i++)
+		std::vector<long double> g(len_g), gi(len_g), gk(len_g), gik(len_g);
+		vec cc(len_g, fill::zeros);
+#pragma omp for reduction(+: E, H)
+		for(int bi=0; bi<nb; bi++)
 		{
-			for (int j=bfirst[i]; j<=blast[i]; j++)
+			elsym(brouting[bi],b, a, bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
+					mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
+					mnit.memptr() + cbmod[bi], g);
+
+			for(int i=cbnit[bi]; i<cbnit[bi+1]; i++)
 			{
-				elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
-						mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
-						mnit.memptr() + cbmod[bi], gi, bfirst[i], a[j]);
-				
-				for (int s = a[j]; s <= bmax[bi]; s++)
+				for (int j=bfirst[i]; j<=blast[i]; j++)
 				{
-					if(g[s]>0)
-					{
-						tmp = b[j] * (gi[s-a[j]]/g[s]);
-						cc[s] = scoretab[cbmax[bi]+s] * tmp;
-						E[j] += cc[s]; 
-						H.at(j,j) += cc[s] * (1-tmp);
-					}
-				}
-				
-				// between categories of the same item
-				for (int k = (j+1); k <= blast[i]; k++)
-				{
-					for (int s = a[k]; s <= bmax[bi]; s++)
+					elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
+							mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
+							mnit.memptr() + cbmod[bi], gi, bfirst[i], a[j]);
+					
+					for (int s = a[j]; s <= bmax[bi]; s++)
 					{
 						if(g[s]>0)
-							H.at(k,j) -= cc[s] * b[k] * (gi[s-a[k]]/g[s]);						
-					}
-					H.at(j,k) = H.at(k,j);
-				}
-				
-				for (int k=i+1; k < cbnit[bi+1]; k++)
-				{
-					for (int l=bfirst[k]; l<=blast[k];l++)
-					{
-						elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
-								mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
-								mnit.memptr() + cbmod[bi], gk, bfirst[k],a[l]);
-					  
-						int success = elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
-											mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
-											mnit.memptr() + cbmod[bi], gik, bfirst[i], a[j], bfirst[k], a[l]);
-						if(success>=0)
-						for (int s=0;s<=bmax[bi];s++)
 						{
-							if (g[s]>0)
+							double tmp = b[j] * (gi[s-a[j]]/g[s]);
+							cc[s] = scoretab[cbmax[bi]+s] * tmp;
+							E[j] += cc[s]; 
+							H.at(j,j) += cc[s] * (1-tmp);
+						}
+					}
+					
+					// between categories of the same item
+					for (int k = (j+1); k <= blast[i]; k++)
+					{
+						for (int s = a[k]; s <= bmax[bi]; s++)
+						{
+							if(g[s]>0)
+								H.at(k,j) -= cc[s] * b[k] * (gi[s-a[k]]/g[s]);						
+						}
+						H.at(j,k) = H.at(k,j);
+					}
+					
+					for (int k=i+1; k < cbnit[bi+1]; k++)
+					{
+						for (int l=bfirst[k]; l<=blast[k];l++)
+						{
+							elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
+									mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
+									mnit.memptr() + cbmod[bi], gk, bfirst[k],a[l]);
+						  
+							int success = elsym(brouting[bi], b, a,  bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
+												mod_min.memptr() + cbmod[bi], mod_max.memptr() + cbmod[bi], nmod[bi],
+												mnit.memptr() + cbmod[bi], gik, bfirst[i], a[j], bfirst[k], a[l]);
+							if(success>=0)
+							for (int s=0;s<=bmax[bi];s++)
 							{
-								if (s >= a[j]+a[l]) 
+								if (g[s]>0)
 								{
-									H.at(l,j) +=  scoretab[cbmax[bi]+s] * (gik[s-a[j]-a[l]]/g[s]) * b[j]*b[l];
-								}
-								if (s >= a[j] && s >= a[l]) // hier gaat em mis waarschijnlijk 
-								{
-									H.at(l,j) -= cc[s] * b[l] * (gk[s-a[l]] / g[s]);//scoretab[cbmax[bi]+s] * b[j] * b[l] * ((gi[s-a[j]]/g[s])*(gk[s-a[l]]/g[s]));
+									if (s >= a[j]+a[l]) 
+									{
+										H.at(l,j) +=  scoretab[cbmax[bi]+s] * (gik[s-a[j]-a[l]]/g[s]) * b[j]*b[l];
+									}
+									if (s >= a[j] && s >= a[l]) 
+									{
+										H.at(l,j) -= cc[s] * b[l] * (gk[s-a[l]] / g[s]);//scoretab[cbmax[bi]+s] * b[j] * b[l] * ((gi[s-a[j]]/g[s])*(gk[s-a[l]]/g[s]));
+									}
 								}
 							}
+							H.at(j,l) = H.at(l,j);
 						}
-						H.at(j,l) = H.at(l,j);
 					}
-				}
-			}		
+				}		
+			}
 		}
 	}
-	// there seems to be no sum of H with it's transpose like in dexter, is this caused by omission of 0 cat?
 }
+
 
 // [[Rcpp::export]]
 void dirichlet(const arma::vec& alpha, arma::vec& out)
@@ -557,8 +577,6 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 }
 
 
-
-// might change to log scale
 
 // for one booklet
 //[[Rcpp::export]]

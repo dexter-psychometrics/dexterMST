@@ -41,23 +41,23 @@ sim_mst = function(pars, theta, test_design, routing_rules, routing=c('last','al
   for(module_id in mdl)
     msum[,module_id] = rowSums(dat[,mdlist[[module_id]]])
 
+  routing_rules$exit_max = coalesce(routing_rules$exit_max, as.integer(1e9))
+  
   if(routing_type=='last')
   {
-    routing_rules$exit_min = coalesce(routing_rules$exit_min ,0L)
-    routing_rules$exit_max = coalesce(routing_rules$exit_max ,as.integer(1e9))
+    routing_rules$exit_min = coalesce(routing_rules$exit_min, 0L)
   } else
   {
     routing_rules = routing_rules %>%
       group_by(.data$booklet_id) %>%
       arrange(.data$module_nbr) %>%
-      mutate(exit_min = coalesce(.data$exit_min,lag(.data$exit_min,default=0L)),
-             exit_max=c(.data$exit_max[-n()],coalesce(.data$exit_max[n()],as.integer(1e9)))) %>%
+      mutate(exit_min = coalesce(.data$exit_min,lag(.data$exit_min,default=0L))) %>%
       ungroup()
   }
   
   lapply(split(routing_rules, routing_rules$booklet_id), function(rl){
     indx = rep(TRUE,length(theta))
-    
+
     if(routing_type == 'last')
     {
       for(i in 1:nrow(rl))

@@ -3,11 +3,15 @@ title: "dexterMST: dexter for Multi-Stage Tests"
 author: "Timo Bechger, Jesse Koops, Robert Zwitser, Ivailo Partchev, Gunter Maris"
 date: "`r Sys.Date()`"
 bibliography: dexterMST.bib
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{dexterMST}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 <style>
@@ -181,14 +185,14 @@ Just like in __dexter__, the first really important step is to supply the _scori
 
 If you have scored data, you can simply make the column response match the item_score, as in the following example:
 
-
 ```{r, echo=FALSE}
 scoring_rules %>% slice(1:8) %>% kable(caption='data.frame scoring_rules', row.names=FALSE)
-```
+``` 
 
 ```{r, eval=FALSE}
 add_scoring_rules_mst(db, scoring_rules)
 ```
+
 
 ### Define the test design
 
@@ -359,7 +363,7 @@ This concludes our brief tour of a typical workflow with __dexterMST__. The rest
 
 One should be careful not to apply __dexter__'s estimation routines in MST without thinking. Ordinary CML, in particular, is known to gives biased results under the circumstances (@EggenVerhelst11, @glas1988). Recently, @ZwitserMaris2015 demonstrated that CML estimation is possible, provided that one takes the design into account. Furthermore, they argued that sensible models aka those that admit CML will in general fit quite well to MST data. The same theory was used to adapt __dexter__'s Bayesian estimation method to MST [@koopsmst]. 
 
-In the three years since, the results of @ZwitserMaris2015 have not been mentioned in any of the recent edited volumes on MST, and __dexterMST__ is, to our best knowledge, the first publicly available attempt at a practical implementation. MST data are usually analyzed with _marginal maximum likelihood (MML)_, which is available in a number of R-packages, such as `mirt`. MML estimation makes assumptions about the shape of the ability distribution (usually a normal distribution is assumed), and it can produce unbiased estimates if these assumptions are fulfilled. CML, on the other hand, does not need any such assumptions at all, so it can be expected to perform well in a broader class of situations. 
+In the three years since, the results of @ZwitserMaris2015 have not been mentioned in any of the recent edited volumes on MST, and __dexterMST__ is, to our best knowledge, the first publicly available attempt at a practical implementation. MST data are usually analyzed with _marginal maximum likelihood (MML)_, which is available in a number of R-packages, such as `mirt` and, lately, `dexterMML`. MML estimation makes assumptions about the shape of the ability distribution (usually a normal distribution is assumed), and it can produce unbiased estimates if these assumptions are fulfilled. CML, on the other hand, does not need any such assumptions at all, so it can be expected to perform well in a broader class of situations. 
 
 That MML gives biased results if the ability distribution is misspecified has been shown quite convincingly by @ZwitserMaris2015. We reproduce their example here without the code but note that the data have been simulated with an ability distribution that is not normal but a mixture of two normals. Here is a density plot.
 
@@ -415,13 +419,13 @@ Note that the colors indicate whether the items occurred in <span style="color:r
 <span style="color:rgb(255,0,0);">module 2</span> or <span style="color:rgb(0,205,0);">module 3</span>. It will be clear that the modules are appropriately, albeit not perfectly, ordered in difficulty. Judging from the p-values, the (simulated) respondents would have been comfortable with the test.
 
 ```{r, eval=FALSE}
-tia_tables(get_responses_mst(db))$testStats %>%
-  select(booklet_id, meanP)
+tia_tables(get_responses_mst(db))$booklets %>%
+  select(booklet_id, mean_pvalue)
 ```
 
 ```{r, echo=TRUE}
-tia_tables(get_responses_mst(db))$testStats %>%
-  select(booklet_id, meanP) %>%
+tia_tables(get_responses_mst(db))$booklets %>%
+  select(booklet_id, mean_pvalue) %>%
   kable(caption='mean item correct')
 
 ```

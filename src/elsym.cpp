@@ -266,7 +266,7 @@ void NR( const arma::vec& b, const arma::ivec& a,
 			 const arma::ivec& scoretab,  /* out */ arma::vec& E, arma::mat& H)
 {
 	const int nb = nmod.n_elem;
-	const int len_g = max(bmax) + 1;// if crashes + maxa
+	const int len_g = max(bmax) + 1;
 	
 	// bookkeeping
 	ivec cbmax(nb+1), bnit(nb, fill::zeros), cbnit(nb+1), cbmod(nb+1);
@@ -525,7 +525,7 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 
 
 // to do: possible scores (in range)
-// to do: make things parallel
+
 //[[Rcpp::export]]
 arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::vec& c, 
              arma::ivec& first, arma::ivec& last, 
@@ -539,37 +539,40 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 	const vec logb = log(b);
 	const vec alogc = a % log(c);
 	  
-	mat pi(npar, nscores, fill::zeros);	  
- 
-	std::vector<long double> g(nscores), gi(nscores);
-	vec eta(npar);
+	mat pi(npar, nscores, fill::zeros);	  	
 
-	for (int s = bmin; s <= bmax; s++)
+#pragma omp parallel
 	{
-		//if(ps[s] == 1)
-		//{
-			int k = 0; 
-			eta = exp(logb + s * alogc);
+		std::vector<long double> g(nscores), gi(nscores);
+		vec eta(npar);
+#pragma omp for
+		for (int s = bmin; s <= bmax; s++)
+		{
+			//if(ps[s] == 1)
+			//{
+				int k = 0; 
+				eta = exp(logb + s * alogc);
 
-			elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
-					mod_min.memptr(), mod_max.memptr(), nmod,
-					mnit.memptr(), g);
-			
-			for (int it = 0; it < nI; it++)
-			{
-				for (int j = first[it]; j <= last[it]; j++) 
-				{					
-					int indx = s-a[j];
-					if ( indx >= 0 && indx < (nscores - a[last[it]])) 
-					{
-						elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
-							mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
-						pi.at(k,s) = eta[j] * gi[indx]/g[s];
+				elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
+						mod_min.memptr(), mod_max.memptr(), nmod,
+						mnit.memptr(), g);
+				
+				for (int it = 0; it < nI; it++)
+				{
+					for (int j = first[it]; j <= last[it]; j++) 
+					{					
+						int indx = s-a[j];
+						if ( indx >= 0 && indx < (nscores - a[last[it]])) 
+						{
+							elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
+								mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
+							pi.at(k,s) = eta[j] * gi[indx]/g[s];
+						}
+						k++;
 					}
-					k++;
 				}
-			}
-		//}
+			//}
+		}
 	}
 	return pi;
 }

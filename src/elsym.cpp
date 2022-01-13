@@ -538,7 +538,6 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 	const int nscores = bmax+1;
 	const vec logb = log(b);
 	const vec alogc = a % log(c);
-	int indx;
 	  
 	mat pi(npar, nscores, fill::zeros);	  
  
@@ -559,13 +558,12 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 			for (int it = 0; it < nI; it++)
 			{
 				for (int j = first[it]; j <= last[it]; j++) 
-				{
-					elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
-							mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
-					indx = s-a[j];
+				{					
+					int indx = s-a[j];
 					if ( indx >= 0 && indx < (nscores - a[last[it]])) 
 					{
-						//pi.at(k,s) = exp(log(eta[j]) + log(gi[indx]) - log(g[s]));
+						elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
+							mod_min.memptr(), mod_max.memptr(), nmod,mnit.memptr(), gi, first[it],a[j]);
 						pi.at(k,s) = eta[j] * gi[indx]/g[s];
 					}
 					k++;

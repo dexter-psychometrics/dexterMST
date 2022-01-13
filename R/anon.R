@@ -313,7 +313,6 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   iter=1
   while (converged>0.001)
   {
-    print(paste('RM',iter))
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
                           mnit, min_scores, max_scores)
     EsufI=pi_mat%*%scoretab 
@@ -330,7 +329,6 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   while(converged>0.0001)
   {
     converged=-1
-    print(paste('RM NR',iter))
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
                           mnit, min_scores, max_scores)
     pi_mat[is.na(pi_mat)]=0
@@ -369,7 +367,6 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   {
     iter=iter+1
     converged=-1
-    print(paste('IM',iter))
     tel_ic=1
     for (m in 1:nMod)
     {

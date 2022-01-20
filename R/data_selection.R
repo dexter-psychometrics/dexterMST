@@ -323,6 +323,15 @@ unsafe_mst_data = function(db, qtpredicate,  env)
     mutate(old_bid=as.integer(.data$old_bid)) %>%
     inner_join(dsg$booklets_items, by=c('old_bid','item_id'))
   
+  # check for invalid module level selection
+  check_mod_selection = distinct(bdes,.data$bid, .data$module_nbr) %>%
+    group_by(bid) %>%
+    summarise(valid = max(.data$module_nbr==n()))
+  
+  if(any(!check_mod_selection$valid))
+    stop("Predicate results in illegal module level selection.",call.=FALSE)
+
+  
   mod_max = bdes %>%
     group_by(.data$bid, .data$module_nbr) %>%
     summarise(mod_maxscore = sum(.data$item_maxscore))

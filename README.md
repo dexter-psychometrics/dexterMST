@@ -1,7 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-DexterMST
-=========
+# DexterMST
 
 DexterMST is an R package acting as a companion to dexter and adding
 facilities to manage and analyze data from multistage tests (MST). It
@@ -10,20 +9,19 @@ improving the quality of data through basic test and item analysis, and
 fitting an IRT model, all adapted to the peculiarities of MST designs.
 DexterMST typically works with project database files saved on disk.
 
-Installation
-------------
+## Installation
 
 ``` r
 install.packages('dexterMST')
 ```
 
 If you encounter a bug, please post a minimal reproducible example on
-[github](https://github.com/jessekps/dexter/issues). We post news and
-examples on a [blog](https://dexterities.netlify.app/), it’s also the
-place for general questions.
+[github](https://github.com/dexter-psychometrics/dexter/issues). We post
+news and examples on a
+[blog](https://dexter-psychometrics.github.io/dexter/articles/blog/index.html),
+it’s also the place for general questions.
 
-Example
--------
+## Example
 
 Here is an example for a simple two-stage test.
 
@@ -87,14 +85,14 @@ f = fit_enorm_mst(db)
 head(f)
 ```
 
-| item\_id |  item\_score|        beta|   SE\_beta|
-|:---------|------------:|-----------:|----------:|
-| item01   |            1|  -1.0967010|  0.0629430|
-| item02   |            1|  -0.9396378|  0.0626093|
-| item03   |            1|  -0.9362441|  0.0626050|
-| item04   |            1|  -0.9226755|  0.0625888|
-| item05   |            1|  -0.7974781|  0.0625298|
-| item06   |            1|  -0.8549515|  0.0625365|
+| item_id | item_score |       beta |   SE_beta |
+|:--------|-----------:|-----------:|----------:|
+| item01  |          1 | -1.0863339 | 0.0626345 |
+| item02  |          1 | -0.9418913 | 0.0623325 |
+| item03  |          1 | -0.9251972 | 0.0623113 |
+| item04  |          1 | -0.8020044 | 0.0622434 |
+| item05  |          1 | -0.9318730 | 0.0623195 |
+| item06  |          1 | -0.7521299 | 0.0622601 |
 
 ``` r
 # ability estimates per person
@@ -103,14 +101,14 @@ abl = ability(rsp_data, parms = f)
 head(abl)
 ```
 
-| booklet\_id | person\_id |  booklet\_score|       theta|
-|:------------|:-----------|---------------:|-----------:|
-| 136         | 1          |              14|   0.1155725|
-| 136         | 10         |              20|   0.9510407|
-| 136         | 100        |              15|   0.2505641|
-| 124         | 1000       |              11|  -1.0122974|
-| 125         | 1001       |              19|   0.3546790|
-| 124         | 1002       |              15|  -0.4465699|
+| booklet_id | person_id | booklet_score |      theta |
+|:-----------|:----------|--------------:|-----------:|
+| 136        | 1         |            19 |  0.8404993 |
+| 125        | 10        |            19 |  0.2563194 |
+| 124        | 100       |             9 | -1.3259574 |
+| 136        | 1000      |            19 |  0.8404993 |
+| 136        | 1001      |            14 |  0.1491514 |
+| 125        | 1002      |            18 |  0.1129540 |
 
 ``` r
 # ability estimates without item Item01
@@ -121,17 +119,16 @@ pv = plausible_values(rsp_data, parms = f, nPV = 5)
 head(pv)
 ```
 
-| booklet\_id | person\_id |  booklet\_score|         PV1|         PV2|         PV3|         PV4|         PV5|
-|:------------|:-----------|---------------:|-----------:|-----------:|-----------:|-----------:|-----------:|
-| 136         | 1          |              14|  -0.3310002|   0.1372317|  -0.1772800|  -0.5183684|  -0.0290442|
-| 136         | 10         |              20|   0.8863248|   0.8113941|   0.6248103|   0.8908880|   1.0080691|
-| 136         | 100        |              15|   0.8551317|   0.3975271|   0.4908577|  -0.1864416|  -0.0545868|
-| 136         | 1003       |              16|   0.6045560|   0.1657788|   0.5029436|   0.3651413|   0.5977085|
-| 136         | 1006       |              24|   1.5130258|   1.4255989|   0.7971183|   1.1151426|   1.3334579|
-| 136         | 1008       |              15|   0.1326590|  -0.2617173|   0.0628930|   0.6675144|   0.2771222|
+| booklet_id | person_id | booklet_score |       PV1 |        PV2 |       PV3 |       PV4 |        PV5 |
+|:-----------|:----------|--------------:|----------:|-----------:|----------:|----------:|-----------:|
+| 136        | 1         |            19 | 0.3839768 |  0.8766796 | 1.2262293 | 0.8659529 |  1.3278310 |
+| 136        | 1000      |            19 | 0.4315371 |  0.4050729 | 1.0509408 | 0.5545282 |  0.9193252 |
+| 136        | 1001      |            14 | 0.2054455 |  0.1277102 | 0.4737698 | 0.2015225 |  0.3163110 |
+| 136        | 1006      |            16 | 0.3514111 | -0.0298913 | 0.6811140 | 0.0550563 |  0.2982861 |
+| 136        | 1008      |            14 | 0.0542015 |  0.0259179 | 0.4488831 | 0.4268412 |  0.6982703 |
+| 136        | 1009      |            14 | 0.0898933 |  0.4605046 | 0.3446569 | 0.0130914 | -0.1554303 |
 
-Contributing
-------------
+## Contributing
 
 Contributions are welcome but please check with us first about what you
 would like to contribute.

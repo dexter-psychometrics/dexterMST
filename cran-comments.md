@@ -1,1 +1,1 @@
-This fixes the conditional dependency in the vignette as requested by prof. Brian Ripley. 
+Fixed a bug that caused problems with MST designs with early exit.

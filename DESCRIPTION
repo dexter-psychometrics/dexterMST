@@ -15,7 +15,7 @@ Description: Conditional Maximum Likelihood Calibration and data management of m
   Extended Nominal Response and Interaction models, DIF and profile analysis.
   See Robert J. Zwitser and Gunter Maris (2015)<doi:10.1007/s11336-013-9369-6>.
 License: GPL (>= 2)
-URL: https://dexter-psychometrics.github.io/dexter
+URL: https://dexter-psychometrics.github.io/dexter/
 BugReports: https://github.com/dexter-psychometrics/dexter/issues
 Encoding: UTF-8
 Depends:

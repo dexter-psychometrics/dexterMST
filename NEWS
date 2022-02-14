@@ -1,3 +1,8 @@
+# dexterMST 0.9.3
+
+* Fixed a bug that caused problems with MST designs with early exit - as in an MST designed to select the best candidates and testing 
+* stops after a few modules.  
+
 # dexterMST 0.9.2
 
 * Changes required by Ripley to use Cairo 

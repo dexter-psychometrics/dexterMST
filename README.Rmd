@@ -28,7 +28,7 @@ DexterMST is an R package acting as a companion to dexter and adding facilities 
 install.packages('dexterMST')
 ```
 
-If you encounter a bug, please post a minimal reproducible example on [github](https://github.com/jessekps/dexter/issues). We post news and examples on a [blog](https://dexterities.netlify.app/), it's also the place for general questions.
+If you encounter a bug, please post a minimal reproducible example on [github](https://github.com/dexter-psychometrics/dexter/issues). We post news and examples on a [blog](https://dexter-psychometrics.github.io/dexter/articles/blog/index.html), it's also the place for general questions.
 
 ## Example
 

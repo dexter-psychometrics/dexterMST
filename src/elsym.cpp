@@ -24,30 +24,7 @@ initializer( omp_priv = mat_init(omp_orig) )
 initializer( omp_priv = vec_init(omp_orig) )
 
 
-
-/*
-template< class T>
-void print_vec(const std::vector<T>& v)
-{
-	const int n=v.size();
-	int r=0;
-	printf("[1]   ");
-	for(int i=0;i<n;i++)
-	{
-		printf("%012.3f     ", (double)v[i]);
-		r++;
-		if(r==7)
-		{
-			r=0;
-			printf("\n[%i]  ",i);
-		}
-	}
-	printf("\n");
-	fflush(stdout);
-}
-*/
-
-
+// to accomodate early finish routing rules, g should be max(a) longer than the maximum scoe in a booklet
 int elsym(const int routing, const vec& b, const ivec& a, 
 			int* first_ptr, int* last_ptr, const int nI,
 			const int* mod_min_ptr, const int* mod_max_ptr, const int nmod,
@@ -69,7 +46,7 @@ int elsym(const int routing, const vec& b, const ivec& a,
 	for(int m=0; m<nmod; m++)
 		cnit[m+1] = cnit[m] + nit[m];	
 	
-	std::vector<long double> g(g_out.size(), 0); 
+	std::vector<long double> g(g_out.size(), 0); // this needs to be maxa longer
 	  
 	std::fill(g_out.begin(), g_out.end(), 0); 
 
@@ -106,7 +83,7 @@ int elsym(const int routing, const vec& b, const ivec& a,
 				if(first[i] != item1_first && first[i] != item2_first)
 				{
 					for (int s=Msc; s>=0;s--)
-						for (int j=last[i];j>=first[i];j--)
+						for (int j=last[i];j>=first[i];j--) //needs if(a[j] +s) <= Msc or a longer g vector
 							g[s+a[j]] += g[s]*b[j];
 
 					Msc+=a[last[i]];
@@ -209,7 +186,8 @@ void Expect( const arma::vec& b, const arma::ivec& a,
 			 const arma::ivec& scoretab,  /* out */ arma::vec& E)
 {
 	const int nb = nmod.n_elem;
-	const int len_g = max(bmax) + 1;
+	const int maxA = max(a);
+	const int len_g = max(bmax) + 1 + maxA;
 	
 	// bookkeeping
 	ivec cbmax(nb+1), bnit(nb, fill::zeros), cbnit(nb+1), cbmod(nb+1);
@@ -266,7 +244,8 @@ void NR( const arma::vec& b, const arma::ivec& a,
 			 const arma::ivec& scoretab,  /* out */ arma::vec& E, arma::mat& H)
 {
 	const int nb = nmod.n_elem;
-	const int len_g = max(bmax) + 1;
+	const int maxA = max(a);
+	const int len_g = max(bmax) + 1 + maxA;
 	
 	// bookkeeping
 	ivec cbmax(nb+1), bnit(nb, fill::zeros), cbnit(nb+1), cbmod(nb+1);
@@ -393,7 +372,8 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 	const int nIter = ndraws * step + from;
 
 	const int nb = nmod.n_elem;
-	const int len_g = max(bmax) + 1;
+	const int maxA = max(a);;
+	const int nscores = max(bmax) + 1;
 	const int nit = first.n_elem;
 	const int max_cat = max(last-first)+1;
 	
@@ -421,16 +401,16 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 	// working variables
 	vec y(max_cat), z(nb, fill::zeros);
 	vec bklambda(scoretab.n_elem, fill::zeros);	
-	vec pi_k(len_g, fill::zeros);
+	vec pi_k(nscores, fill::zeros);
 	
 	// set lambda 1 for existing scores
 	for(int k=0; k<nb; k++)
 		for(int s=bmin[k]; s<=bmax[k]; s++)
 			bklambda[cbmax[k]+s] = 1;
 	
-	std::vector<long double> g(len_g);
+	std::vector<long double> g(nscores + maxA);
 	
-	vec fpwr(len_g);
+	vec fpwr(nscores);
 	fpwr[0] = 1;
 	
 	//output
@@ -532,18 +512,18 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 			 const int bmin, const int bmax, const int nmod, const int brouting,
 			 arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max)
 {
-	
+	// zou last.n_elem verkeerd kunnen zijn in aanroep?
 	const int nI = last.n_elem;
 	const int npar = accu(last-first) + nI;
-	const int nscores = bmax+1;
+	const int nscores = bmax+1, maxA=max(a);
 	const vec logb = log(b);
 	const vec alogc = a % log(c);
 	  
 	mat pi(npar, nscores, fill::zeros);	  	
-
+	
 #pragma omp parallel
 	{
-		std::vector<long double> g(nscores), gi(nscores);
+		std::vector<long double> g(nscores + maxA), gi(nscores + maxA);
 		vec eta(npar);
 #pragma omp for
 		for (int s = bmin; s <= bmax; s++)
@@ -552,7 +532,7 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 			//{
 				int k = 0; 
 				eta = exp(logb + s * alogc);
-
+				
 				elsym(brouting, eta, a,  first.memptr(), last.memptr(), nI, 
 						mod_min.memptr(), mod_max.memptr(), nmod,
 						mnit.memptr(), g);
@@ -585,7 +565,7 @@ arma::vec elsym_C(const int routing, const arma::vec& b, const arma::ivec& a, ar
 					arma::ivec& mod_min, arma::ivec& mod_max, arma::ivec& mnit, const int max_score,
 					const int item1_first=-1, const int aij=1, const int item2_first=-1, const int akl=1)
 {
-	std::vector<long double> g(max_score+1);
+	std::vector<long double> g(max_score+1+max(a));
 	vec out(max_score+1);
 	elsym(routing, b, a, first.memptr(), last.memptr(), first.n_elem, mod_min.memptr(), mod_max.memptr(), 
        mnit.n_elem, mnit.memptr(), g, item1_first, aij, item2_first, akl);
@@ -605,7 +585,9 @@ arma::vec prof_enorm(const arma::vec& b, const arma::ivec& a, arma::ivec& first,
 	const int nmod = mnit.n_elem;
 	int idx=0, mA=0, mB=0;
 	
-	std::vector<long double> gA(max_score+1), gB(max_score+1);
+	//working memory size, take early finish booklets into account
+	const int sz = 1 + accu(a.elem(conv_to<uvec>::from(last)));
+	std::vector<long double> gA(sz), gB(sz);
 	
 	ivec cnit(nmod+1);
 	cnit[0] = 0;

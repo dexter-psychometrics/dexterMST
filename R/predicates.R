@@ -519,12 +519,11 @@ translate_sql = function(e, variant) # variant = c('ansi','sqlite','postgresql')
   if(type == 'list')
     stop('lists cannot be translated')
   
-  if(class(e) == 'matrix')
+  if(inherits(e, 'matrix'))
   {
     e = drop(e)
     stopifnot(is.null(dim(e)))
-  }
-  if(class(e) == 'array')
+  } else if(inherits(e, 'array'))
   {
     stopifnot(length(dim(e))==1)
     e = as.vector(e)

@@ -213,7 +213,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
   }
   class(out) = append(c('mst_enorm', 'prms') ,class(out))
   
-  out$abl_tables$mle = ability_tables(out, standard_errors=FALSE) %>%
+  out$abl_tables$mle = ability_tables(out) %>%
     filter(is.finite(.data$theta)) 
   
   out$abl_tables$mle$booklet_id = ffactor(out$abl_tables$mle$booklet_id, levels=levels(routing$bid))

@@ -317,10 +317,10 @@ ggplot(full_join(prof, prof_naive,
                  by=c('booklet_score','booklet_id','item_domain')) %>%
          full_join(observed_smooth, by=c('booklet_score','booklet_id','item_domain')),
        aes(x = booklet_score, y = expected_domain_score.x, colour = item_domain)) +
-  geom_line(size=0.3) + 
+  geom_line(linewidth=0.3) + 
   geom_point(aes(y=observed_score), size = 0.1) +
   facet_grid(booklet_id~.,scale='free_y') + 
-  geom_line(aes(y=expected_domain_score.y), linetype = 'dotted',size=0.4) +
+  geom_line(aes(y=expected_domain_score.y), linetype = 'dotted',linewidth=0.4) +
   theme(panel.background = element_blank()) +
   labs(y='domain score', x ='test score')
 
@@ -380,8 +380,8 @@ Note that a distribution that is not normal is not, in any way, ab-normal. In ed
 delta.cml.mst = coef(f)$beta
 
 # ordinary cml with dexter
-long.data = gather(bk1, key='item_id', value='item_score', -.data$person_id) %>%
-  bind_rows(gather(bk2, key='item_id', value='item_score', -.data$person_id))
+long.data = gather(bk1, key='item_id', value='item_score', -person_id) %>%
+  bind_rows(gather(bk2, key='item_id', value='item_score', -person_id))
 
 par.cml.lin = fit_enorm(long.data)
 delta.cml.lin = coef(par.cml.lin)$beta 

@@ -1,1 +1,1 @@
-Fixed a bug that caused problems with MST designs with early exit.
+prepare for update in dependency

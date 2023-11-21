@@ -1,7 +1,7 @@
 Package: dexterMST
 Type: Package
 Title: CML and Bayesian Calibration of Multistage Tests
-Version: 0.9.3
+Version: 0.9.4
 Date: 2022-02-14
 Authors@R: c(person("Timo", "Bechger", role = c("aut", "cre"),
                      email = "tmbechger@gmail.com"),

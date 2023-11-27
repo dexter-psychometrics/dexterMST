@@ -1,6 +1,7 @@
 useDynLib(dexterMST, .registration=TRUE)
 
 importFrom(Rcpp, 'evalCpp')
+importFrom(RcppArmadillo, 'armadillo_throttle_cores')
 import(dexter)
 import(dplyr)
 importFrom(RSQLite,"SQLite")
@@ -9,7 +10,7 @@ importFrom(DBI, "dbSendQuery","dbColumnInfo","dbClearResult","dbListFields","dbC
 importFrom(rlang, 'caller_env', '.data', 'eval_tidy', ':=', 'sym','env_has')
 importFrom(igraph, 'graph.data.frame', 'decompose.graph', 'topological.sort', 
                     'layout.reingold.tilford', 'vcount', 'V', 'vertex_attr','simplify')
-importFrom(tidyr, 'separate', 'gather')
+importFrom(tidyr, 'separate', 'pivot_longer')
 importFrom(crayon,'red')
 
 importFrom(graphics, "abline", "lines", "par", "plot", "points", "axis", "image")

@@ -63,7 +63,7 @@ design_plot = function(db, predicate = NULL, by_booklet=FALSE,...)
     {
       n_rsp = admin %>%
         mutate(bid = paste(dense_rank(.data$test_id), dense_rank(.data$booklet_id))) %>%
-        select(-.data$test_id,-.data$booklet_id)
+        select(-'test_id',-'booklet_id')
     }
     
   } else

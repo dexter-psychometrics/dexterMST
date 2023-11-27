@@ -147,6 +147,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// omp_ncores
+int omp_ncores();
+RcppExport SEXP _dexterMST_omp_ncores() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(omp_ncores());
+    return rcpp_result_gen;
+END_RCPP
+}
 // Expect
 void Expect(const arma::vec& b, const arma::ivec& a, arma::ivec& bfirst, arma::ivec& blast, const arma::ivec& bmax, const arma::ivec& nmod, const arma::ivec& brouting, arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max, const arma::ivec& scoretab, /* out */ arma::vec& E);
 RcppExport SEXP _dexterMST_Expect(SEXP bSEXP, SEXP aSEXP, SEXP bfirstSEXP, SEXP blastSEXP, SEXP bmaxSEXP, SEXP nmodSEXP, SEXP broutingSEXP, SEXP mnitSEXP, SEXP mod_minSEXP, SEXP mod_maxSEXP, SEXP scoretabSEXP, SEXP ESEXP) {
@@ -169,8 +179,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // NR
-void NR(const arma::vec& b, const arma::ivec& a, arma::ivec& bfirst, arma::ivec& blast, const arma::ivec& bmax, const arma::ivec& nmod, const arma::ivec& brouting, arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max, const arma::ivec& scoretab, /* out */ arma::vec& E, arma::mat& H);
-RcppExport SEXP _dexterMST_NR(SEXP bSEXP, SEXP aSEXP, SEXP bfirstSEXP, SEXP blastSEXP, SEXP bmaxSEXP, SEXP nmodSEXP, SEXP broutingSEXP, SEXP mnitSEXP, SEXP mod_minSEXP, SEXP mod_maxSEXP, SEXP scoretabSEXP, SEXP ESEXP, SEXP HSEXP) {
+void NR(const arma::vec& b, const arma::ivec& a, arma::ivec& bfirst, arma::ivec& blast, const arma::ivec& bmax, const arma::ivec& nmod, const arma::ivec& brouting, arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max, const arma::ivec& scoretab, const int ncores, /* out */ arma::vec& E, arma::mat& H);
+RcppExport SEXP _dexterMST_NR(SEXP bSEXP, SEXP aSEXP, SEXP bfirstSEXP, SEXP blastSEXP, SEXP bmaxSEXP, SEXP nmodSEXP, SEXP broutingSEXP, SEXP mnitSEXP, SEXP mod_minSEXP, SEXP mod_maxSEXP, SEXP scoretabSEXP, SEXP ncoresSEXP, SEXP ESEXP, SEXP HSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::vec& >::type b(bSEXP);
@@ -184,9 +194,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::ivec& >::type mod_min(mod_minSEXP);
     Rcpp::traits::input_parameter< const arma::ivec& >::type mod_max(mod_maxSEXP);
     Rcpp::traits::input_parameter< const arma::ivec& >::type scoretab(scoretabSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncores(ncoresSEXP);
     Rcpp::traits::input_parameter< /* out */ arma::vec& >::type E(ESEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type H(HSEXP);
-    NR(b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, E, H);
+    NR(b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, ncores, E, H);
     return R_NilValue;
 END_RCPP
 }
@@ -237,8 +248,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // ittotmat_mst
-arma::mat ittotmat_mst(const arma::vec& b, const arma::ivec& a, const arma::vec& c, arma::ivec& first, arma::ivec& last, const int bmin, const int bmax, const int nmod, const int brouting, arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max);
-RcppExport SEXP _dexterMST_ittotmat_mst(SEXP bSEXP, SEXP aSEXP, SEXP cSEXP, SEXP firstSEXP, SEXP lastSEXP, SEXP bminSEXP, SEXP bmaxSEXP, SEXP nmodSEXP, SEXP broutingSEXP, SEXP mnitSEXP, SEXP mod_minSEXP, SEXP mod_maxSEXP) {
+arma::mat ittotmat_mst(const arma::vec& b, const arma::ivec& a, const arma::vec& c, arma::ivec& first, arma::ivec& last, const int bmin, const int bmax, const int nmod, const int brouting, arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max, const int ncores);
+RcppExport SEXP _dexterMST_ittotmat_mst(SEXP bSEXP, SEXP aSEXP, SEXP cSEXP, SEXP firstSEXP, SEXP lastSEXP, SEXP bminSEXP, SEXP bmaxSEXP, SEXP nmodSEXP, SEXP broutingSEXP, SEXP mnitSEXP, SEXP mod_minSEXP, SEXP mod_maxSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -254,7 +265,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::ivec& >::type mnit(mnitSEXP);
     Rcpp::traits::input_parameter< const arma::ivec& >::type mod_min(mod_minSEXP);
     Rcpp::traits::input_parameter< const arma::ivec& >::type mod_max(mod_maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(ittotmat_mst(b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max));
+    Rcpp::traits::input_parameter< const int >::type ncores(ncoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(ittotmat_mst(b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max, ncores));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -313,11 +325,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dexterMST_im_booklet_score", (DL_FUNC) &_dexterMST_im_booklet_score, 2},
     {"_dexterMST_suf_stats_im_c", (DL_FUNC) &_dexterMST_suf_stats_im_c, 5},
     {"_dexterMST_is_connected_C", (DL_FUNC) &_dexterMST_is_connected_C, 1},
+    {"_dexterMST_omp_ncores", (DL_FUNC) &_dexterMST_omp_ncores, 0},
     {"_dexterMST_Expect", (DL_FUNC) &_dexterMST_Expect, 12},
-    {"_dexterMST_NR", (DL_FUNC) &_dexterMST_NR, 13},
+    {"_dexterMST_NR", (DL_FUNC) &_dexterMST_NR, 14},
     {"_dexterMST_dirichlet", (DL_FUNC) &_dexterMST_dirichlet, 2},
     {"_dexterMST_calibrate_Bayes", (DL_FUNC) &_dexterMST_calibrate_Bayes, 25},
-    {"_dexterMST_ittotmat_mst", (DL_FUNC) &_dexterMST_ittotmat_mst, 12},
+    {"_dexterMST_ittotmat_mst", (DL_FUNC) &_dexterMST_ittotmat_mst, 13},
     {"_dexterMST_elsym_C", (DL_FUNC) &_dexterMST_elsym_C, 13},
     {"_dexterMST_prof_enorm", (DL_FUNC) &_dexterMST_prof_enorm, 10},
     {NULL, NULL, 0}

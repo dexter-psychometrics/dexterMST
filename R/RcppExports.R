@@ -41,12 +41,16 @@ is_connected_C <- function(A) {
     .Call(`_dexterMST_is_connected_C`, A)
 }
 
+omp_ncores <- function() {
+    .Call(`_dexterMST_omp_ncores`)
+}
+
 Expect <- function(b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, E) {
     invisible(.Call(`_dexterMST_Expect`, b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, E))
 }
 
-NR <- function(b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, E, H) {
-    invisible(.Call(`_dexterMST_NR`, b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, E, H))
+NR <- function(b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, ncores, E, H) {
+    invisible(.Call(`_dexterMST_NR`, b, a, bfirst, blast, bmax, nmod, brouting, mnit, mod_min, mod_max, scoretab, ncores, E, H))
 }
 
 dirichlet <- function(alpha, out) {
@@ -57,8 +61,8 @@ calibrate_Bayes <- function(a, first, last, bfirst, blast, bmax, bmin, nmod, bro
     .Call(`_dexterMST_calibrate_Bayes`, a, first, last, bfirst, blast, bmax, bmin, nmod, brouting, mnit, mod_min, mod_max, itb, itnb, sufI, scoretab, b, fixed_b, from, step, ndraws, prior_eta, prior_rho, prior_nu, prior_sigma)
 }
 
-ittotmat_mst <- function(b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max) {
-    .Call(`_dexterMST_ittotmat_mst`, b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max)
+ittotmat_mst <- function(b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max, ncores) {
+    .Call(`_dexterMST_ittotmat_mst`, b, a, c, first, last, bmin, bmax, nmod, brouting, mnit, mod_min, mod_max, ncores)
 }
 
 elsym_C <- function(routing, b, a, first, last, mod_min, mod_max, mnit, max_score, item1_first = -1L, aij = 1L, item2_first = -1L, akl = 1L) {

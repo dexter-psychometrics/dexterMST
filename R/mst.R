@@ -333,6 +333,9 @@ alter_scoring_rules_mst = function(db, rules)
 #' 
 #' 
 #' @examples
+#' 
+#' \dontshow{ RcppArmadillo::armadillo_throttle_cores(2)}
+#' 
 #' # extended example
 #' # we: 
 #' # 1) define an mst design
@@ -393,6 +396,8 @@ alter_scoring_rules_mst = function(db, rules)
 #' 
 #' cor(abl$theta, abl$theta.sim)
 #' 
+#' \dontshow{ RcppArmadillo::armadillo_reset_cores()}
+#' 
 create_mst_test = function(db, test_design, routing_rules, test_id, routing = c('all', 'last'))
 {
   routing = match.arg(routing)
@@ -406,11 +411,11 @@ create_mst_test = function(db, test_design, routing_rules, test_id, routing = c(
   }
   
   test_design = test_design %>% 
-    select(.data$item_id, .data$module_id, .data$item_position) %>%
+    select('item_id', 'module_id', 'item_position') %>%
     mutate_if(is.factor, as.character)
   
   routing_rules = routing_rules %>%
-    select(.data$module_id, .data$exit_min, .data$exit_max, .data$module_nbr, .data$booklet_id) %>%
+    select('module_id', 'exit_min', 'exit_max', 'module_nbr', 'booklet_id') %>%
     mutate_if(is.factor, as.character)
   
   check_routing(routing_rules)
@@ -536,13 +541,13 @@ create_mst_test = function(db, test_design, routing_rules, test_id, routing = c(
               test_design %>%
                 mutate(test_id = test_id) %>% 
                 semi_join(bd, by='module_id') %>%
-                select(.data$test_id, .data$module_id, .data$item_id,	.data$item_position))
+                select('test_id', 'module_id', 'item_id',	'item_position'))
     bd$test_id = test_id
     dbExecute(db, 
         'INSERT INTO Booklet_design(test_id, booklet_id,
     	                              module_id, module_nbr, module_exit_score_min,	module_exit_score_max) 
           VALUES(:test_id, :booklet_id, :module_id, :module_nbr, :exit_min, :exit_max);',
-        select(bd,.data$test_id, .data$booklet_id, .data$module_id, .data$module_nbr, .data$exit_min, .data$exit_max))
+        select(bd,'test_id', 'booklet_id', 'module_id', 'module_nbr', 'exit_min', 'exit_max'))
   })  
  invisible(NULL)
 }
@@ -576,7 +581,7 @@ add_response_data_mst = function(db, rsp_data, auto_add_unknown_rules = FALSE)
     stop('columns (person_id, test_id, booklet_id, item_id, response) are required')
   
   rsp_data = rsp_data %>% 
-    select(.data$person_id, .data$test_id, .data$booklet_id, .data$item_id, .data$response)
+    select('person_id', 'test_id', 'booklet_id', 'item_id', 'response')
   
   md = dbGetQuery(db,'SELECT test_id, booklet_id, module_id, item_id 
                         FROM Booklet_design INNER JOIN Module_design USING(test_id, module_id);')
@@ -683,7 +688,7 @@ add_response_data_mst = function(db, rsp_data, auto_add_unknown_rules = FALSE)
     
     n2 = dbExecute(db, 'INSERT INTO Responses(person_id, test_id, booklet_id, module_id, item_id, response)
                         VALUES(:person_id, :test_id, :booklet_id, :module_id, :item_id, :response);', 
-                  select(rsp_data, .data$person_id, .data$test_id, .data$booklet_id, .data$module_id, .data$item_id, .data$response))
+                  select(rsp_data, 'person_id', 'test_id', 'booklet_id', 'module_id', 'item_id', 'response'))
   })
   cat(paste('Added', n2, 'responses for', n1, 'administrations\n'))
 }
@@ -697,8 +702,10 @@ add_booklet_mst = function(db, booklet_data, test_id, booklet_id, auto_add_unkno
   if(any(duplicated(booklet_data$person_id)))
     stop('column person_id must contain unique values')
   
-  rsp_data = gather(booklet_data, key='item_id', value='response', -.data$person_id)
-  
+  rsp_data = booklet_data %>%
+    mutate(across(-'person_id',as.character)) %>%
+    pivot_longer(names_to='item_id', values_to='response', -'person_id')
+
   rsp_data$test_id = test_id
   rsp_data$booklet_id = booklet_id
   

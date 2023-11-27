@@ -96,7 +96,7 @@ profile_tables_mst = function(parms, domains, item_property)
 
   }) %>%
     ungroup() %>%
-    select(-.data$bid) %>%
+    select(-'bid') %>%
     mutate_if(is.factor,as.character)
   
   names(out)[names(out)=='item_domain'] = item_property

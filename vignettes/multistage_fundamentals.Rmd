@@ -380,8 +380,8 @@ Note that a distribution that is not normal is not, in any way, ab-normal. In ed
 delta.cml.mst = coef(f)$beta
 
 # ordinary cml with dexter
-long.data = gather(bk1, key='item_id', value='item_score', -person_id) %>%
-  bind_rows(gather(bk2, key='item_id', value='item_score', -person_id))
+long.data = pivot_longer(bk1, names_to='item_id', values_to='item_score', -'person_id') %>%
+  bind_rows(pivot_longer(bk2, names_to='item_id', values_to='item_score', -'person_id'))
 
 par.cml.lin = fit_enorm(long.data)
 delta.cml.lin = coef(par.cml.lin)$beta 

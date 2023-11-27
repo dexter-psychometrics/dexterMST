@@ -2,6 +2,10 @@ context('enter sim data and test cml')
 
 library(dplyr)
 
+# testthat's on cran function, for better or worse
+
+on_cran = function() !interactive() && !isTRUE(as.logical(Sys.getenv("NOT_CRAN", "false")))
+
 set.seed(123)
 items = data.frame(item_id=sprintf("item%02i",1:70), item_score=1, delta=sort(runif(70,-1,1)))
 
@@ -84,6 +88,9 @@ get_sim_last = function()
 }
 
 test_that('we can calibrate', {
+  if(on_cran())
+    RcppArmadillo::armadillo_throttle_cores(2)
+  
   all_db = get_sim_all()
   last_db = get_sim_last()
   
@@ -153,6 +160,9 @@ test_that('we can calibrate', {
 
   close_mst_project(all_db)
   close_mst_project(last_db)
+  
+  if(on_cran())
+    RcppArmadillo::armadillo_reset_cores()
   
 })
 

@@ -222,16 +222,16 @@ import_from_dexter = function(db, dexter_db, dx_response_prefix = '' )
     {
       dbExecute(db,
         'INSERT INTO Tests(test_id) VALUES(:booklet_id);',
-        select(dxbooklets, .data$booklet_id))
+        select(dxbooklets, 'booklet_id'))
     }
     
     dbExecute(db, 
               'INSERT INTO Booklets(test_id, booklet_id) VALUES(:booklet_id,:booklet_id);',
-              select(dxbooklets,.data$booklet_id))
+              select(dxbooklets,'booklet_id'))
       
     dbExecute(db, 
               'INSERT INTO Modules(test_id, module_id) VALUES(:booklet_id,:booklet_id);',
-              select(dxbooklets,.data$booklet_id))
+              select(dxbooklets,'booklet_id'))
       
     dxdesign = dbReadTable(dxdb, 'dxBooklet_design')
     

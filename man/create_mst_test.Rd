@@ -48,6 +48,9 @@ both when defining the test and when entering data,
 to make sure your routing rules are valid and your data conform to them.
 }
 \examples{
+
+\dontshow{ RcppArmadillo::armadillo_throttle_cores(2)}
+
 # extended example
 # we: 
 # 1) define an mst design
@@ -107,5 +110,7 @@ plot(abl$theta, abl$theta.sim)
 abl = filter(abl, is.finite(theta))
 
 cor(abl$theta, abl$theta.sim)
+
+\dontshow{ RcppArmadillo::armadillo_reset_cores()}
 
 }

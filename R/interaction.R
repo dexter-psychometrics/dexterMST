@@ -221,7 +221,7 @@ print.im_mst = function(x, ...)
 coef.im_mst = function(object, ...)
 {
   object$inputs$ssIS %>%
-    select(.data$item_id, .data$item_score) %>%
+    select('item_id', 'item_score') %>%
     add_column(bRM = object$pars$bRM, cRM = object$pars$cRM, bIM = object$pars$bIM, cIM = object$pars$cIM,
                se.c = object$pars$se.c, fit.IM = object$pars$fit.stats)
 }

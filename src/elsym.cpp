@@ -1,5 +1,5 @@
-
 #include <RcppArmadillo.h>
+#include <omp.h>
 
 #define ALL 0
 #define LAST 1
@@ -241,7 +241,7 @@ void NR( const arma::vec& b, const arma::ivec& a,
              arma::ivec& bfirst, arma::ivec& blast, const arma::ivec& bmax,
 			 const arma::ivec& nmod,  const arma::ivec& brouting,
 			 arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max,
-			 const arma::ivec& scoretab,  /* out */ arma::vec& E, arma::mat& H)
+			 const arma::ivec& scoretab, const int ncores,  /* out */ arma::vec& E, arma::mat& H)
 {
 	const int nb = nmod.n_elem;
 	const int maxA = max(a);
@@ -264,11 +264,11 @@ void NR( const arma::vec& b, const arma::ivec& a,
 	
 	E.zeros();
 	H.zeros();
-#pragma omp parallel
+#pragma omp parallel num_threads(ncores)
 	{
 		std::vector<long double> g(len_g), gi(len_g), gk(len_g), gik(len_g);
 		vec cc(len_g, fill::zeros);
-#pragma omp for reduction(+: E, H)
+#pragma omp for reduction(+: E, H) 
 		for(int bi=0; bi<nb; bi++)
 		{
 			elsym(brouting[bi],b, a, bfirst.memptr() + cbnit[bi], blast.memptr() + cbnit[bi], bnit[bi], 
@@ -510,7 +510,7 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::vec& c, 
              arma::ivec& first, arma::ivec& last, 
 			 const int bmin, const int bmax, const int nmod, const int brouting,
-			 arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max)
+			 arma::ivec& mnit, const arma::ivec& mod_min, const arma::ivec& mod_max, const int ncores)
 {
 	// zou last.n_elem verkeerd kunnen zijn in aanroep?
 	const int nI = last.n_elem;
@@ -521,11 +521,11 @@ arma::mat  ittotmat_mst( const arma::vec& b, const arma::ivec& a, const arma::ve
 	  
 	mat pi(npar, nscores, fill::zeros);	  	
 	
-#pragma omp parallel
+#pragma omp parallel num_threads(ncores)
 	{
 		std::vector<long double> g(nscores + maxA), gi(nscores + maxA);
 		vec eta(npar);
-#pragma omp for
+#pragma omp for 
 		for (int s = bmin; s <= bmax; s++)
 		{
 			//if(ps[s] == 1)

@@ -5,8 +5,11 @@ library(dexter)
 library(tidyr)
 library(RSQLite)
 
+on_cran = function() !interactive() && !isTRUE(as.logical(Sys.getenv("NOT_CRAN", "false")))
 
 test_that('discriminations', {
+  if(on_cran())
+    RcppArmadillo::armadillo_throttle_cores(2)
   
   # set a seed for determinism in cran check
   # expect this check to succeed with > 99% of seeds
@@ -56,13 +59,18 @@ test_that('discriminations', {
   
   expect_gt(cor(items$beta,coef(f)$beta), 0.98)
   dbDisconnect(db)
+  
+  if(on_cran())
+    RcppArmadillo::armadillo_reset_cores()
 
 })
 
 
 
 test_that('poly NR problem', {
-
+  if(on_cran())
+    RcppArmadillo::armadillo_throttle_cores(2)
+  
   db = start_new_project(verbAggrRules, ":memory:")
   add_booklet(db, verbAggrData, "agg")
   
@@ -109,6 +117,8 @@ test_that('poly NR problem', {
   #abline(0,1)
   dbDisconnect(db)
   
+  if(on_cran())
+    RcppArmadillo::armadillo_reset_cores()
   
 })
 
@@ -119,6 +129,8 @@ test_that('poly NR problem', {
 
 
 test_that('poly normal2', {
+  if(on_cran())
+    RcppArmadillo::armadillo_throttle_cores(2)
   
   db = start_new_project(verbAggrRules, ":memory:")
   add_booklet(db, verbAggrData, "agg")
@@ -178,5 +190,7 @@ test_that('poly normal2', {
   
   dbDisconnect(db)
   
+  if(on_cran())
+    RcppArmadillo::armadillo_reset_cores()
 })
 

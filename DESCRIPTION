@@ -1,8 +1,8 @@
 Package: dexterMST
 Type: Package
 Title: CML and Bayesian Calibration of Multistage Tests
-Version: 0.9.4
-Date: 2022-02-14
+Version: 0.9.5
+Date: 2023-11-21
 Authors@R: c(person("Timo", "Bechger", role = c("aut", "cre"),
                      email = "tmbechger@gmail.com"),
               person("Jesse","Koops", role = "aut"),
@@ -22,7 +22,8 @@ Depends:
     R (>= 3.4)
 Imports:
   Rcpp,
-  dexter (>= 1.1.4),
+  RcppArmadillo,
+  dexter (>= 1.2.2),
   dplyr,
   RSQLite,
   rlang,
@@ -34,8 +35,8 @@ Imports:
   methods,
   stats,
   utils
-LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.1.2
+LinkingTo: Rcpp, RcppArmadillo (>= 0.12.6.6.0)
+RoxygenNote: 7.2.3
 Suggests:
     knitr,
     rmarkdown,

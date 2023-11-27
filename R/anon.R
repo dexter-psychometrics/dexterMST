@@ -94,6 +94,8 @@ Calibrate_MST = function(first, last, a, sufI, scoretab, booklets, design, modul
   H = matrix(0,length(a),length(a))
   ref_cat=1
 
+  ncores = get_cores()
+  
   design$cfirst = as.integer(design$first-1L)
   design$clast = as.integer(design$last-1L)
   booklets$routing = ROUTING[booklets$routing]
@@ -133,7 +135,7 @@ Calibrate_MST = function(first, last, a, sufI, scoretab, booklets, design, modul
       NR(b, a, design$cfirst, design$clast, 
          booklets$max_score, booklets$nmod, booklets$routing,
          modules$nit, modules$module_exit_score_min, modules$module_exit_score_max,
-         scoretab$N, EsufI, H)
+         scoretab$N, ncores, EsufI, H)
       
       H[ref_cat,]=0; H[,ref_cat]=0
       H[ref_cat,ref_cat]=1
@@ -181,7 +183,7 @@ Calibrate_MST = function(first, last, a, sufI, scoretab, booklets, design, modul
       NR(b, a, design$cfirst, design$clast, 
          booklets$max_score, booklets$nmod, booklets$routing,
          modules$nit, modules$module_exit_score_min, modules$module_exit_score_max,
-         scoretab$N, EsufI, H)
+         scoretab$N, ncores, EsufI, H)
       
       H[fixed_set,]=0
       H[,fixed_set]=0
@@ -273,6 +275,9 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   clast = as.integer(unlist(last)-1L)
   crouting = ROUTING[routing]
   
+  ncores = get_cores()
+  
+  
   if(routing=='all')
   {
     bmax = last(max_scores)
@@ -314,7 +319,7 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   while (converged>0.001)
   {
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
-                          mnit, min_scores, max_scores)
+                          mnit, min_scores, max_scores, ncores)
     EsufI=pi_mat%*%scoretab 
     b=b*sufI/EsufI
     converged=(max(abs(sufI-EsufI))/mm)
@@ -330,7 +335,7 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   {
     converged=-1
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
-                          mnit, min_scores, max_scores)
+                          mnit, min_scores, max_scores,ncores)
     pi_mat[is.na(pi_mat)]=0
 
     for (m in 1:nMod)
@@ -356,7 +361,7 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
   scale=2
   
   pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
-                        mnit, min_scores, max_scores)
+                        mnit, min_scores, max_scores, ncores)
   
   out$regs$ctrRM = pi_mat
   out$bRM=drop(b)
@@ -413,7 +418,7 @@ Estim_MST = function(a, first, last, min_scores, max_scores, sufI, sufC, scoreta
       }
     }
     pi_mat = ittotmat_mst(b, a, rep(ic,ncat), cfirst, clast, bmin, bmax, nMod, crouting,
-                          mnit, min_scores, max_scores)
+                          mnit, min_scores, max_scores, ncores)
     
     if (converged<1) scale=1
   }

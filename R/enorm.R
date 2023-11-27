@@ -66,7 +66,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
   
 
   routing = respData$routing %>%
-    select(-.data$test_id,-.data$booklet_id) %>%
+    select(-'test_id',-'booklet_id') %>%
     arrange(.data$bid, .data$module_nbr)
   
   # calibration_design gives wrong results
@@ -77,7 +77,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
   design = respData$booklet_design %>%
     inner_join(ssI, by='item_id') %>%
     inner_join(routing, by=c('bid','module_nbr')) %>%
-    select(.data$bid, .data$module_nbr, .data$first, .data$last, .data$item_id) %>%
+    select('bid', 'module_nbr', 'first', 'last', 'item_id') %>%
     arrange(.data$bid, .data$module_nbr, .data$first)
   
   if(!is_connected(design$bid, design$first, design$last))
@@ -100,11 +100,11 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
     ungroup() %>%
     mutate(max_score = if_else(routing=='all', .data$last_max, .data$sum_max),
            min_score = if_else(routing=='all', .data$last_min, .data$sum_min)) %>%
-    select(.data$bid, .data$routing, .data$nmod, .data$max_score, .data$min_score) %>%
+    select('bid', 'routing', 'nmod', 'max_score', 'min_score') %>%
     arrange(.data$bid)
   
   scoretab = plt %>%
-    select(.data$bid, .data$booklet_score,.data$N) %>%
+    select('bid', 'booklet_score','N') %>%
     distinct(.data$bid, .data$booklet_score, .keep_all=TRUE)  %>%
     right_join(tibble(bid = rep(booklets$bid, booklets$max_score+1),
                       booklet_score = unlist(lapply(booklets$max_score, function(s) 0:s))),
@@ -141,7 +141,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
     fixed_parameters$b = dx_b
     
     fixed_parameters = ssIS %>%
-      select(.data$item_id, .data$item_score) %>%
+      select('item_id', 'item_score') %>%
       mutate(item_id = as.character(.data$item_id)) %>%
       left_join(fixed_parameters, by=c('item_id','item_score')) %>%
       arrange(.data$item_id, .data$item_score) %>%
@@ -185,7 +185,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
                            has_fixed_parms = !is.null(fixed_parameters)))
              
   out$inputs$design = design %>%
-    select(booklet_id=.data$bid,.data$item_id) %>%
+    select(booklet_id='bid', 'item_id') %>%
     inner_join(out$inputs$ssI[,c('item_id','first','last')],by='item_id')
 
   
@@ -197,7 +197,7 @@ fit_enorm_mst_ = function(db, qtpredicate, env, fixed_parameters=NULL, method=c(
     
   } else
   {
-    out$mst_est = bind_cols(select(ssIS, .data$item_id, .data$item_score), 
+    out$mst_est = bind_cols(select(ssIS, 'item_id', 'item_score'), 
                             res[names(res) != 'acov.beta'])
   }
   renorm = is.null(fixed_parameters) || all(is.na(fixed_parameters))

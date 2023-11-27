@@ -70,7 +70,7 @@ DIF_mst = function(db, person_property, predicate=NULL)
   
   new_items = coef(models[[1]]) %>%
     inner_join(tibble(item_id = common_items), by='item_id') %>%
-    select(.data$item_id, .data$item_score) %>%
+    select('item_id', 'item_score') %>%
     arrange(.data$item_id, .data$item_score) 
   
   
@@ -82,7 +82,7 @@ DIF_mst = function(db, person_property, predicate=NULL)
         arrange(.data$item_id, .data$item_score) %>%
         mutate(rn = row_number()) %>%
         inner_join(tibble(item_id = common_items), by='item_id') %>%
-        select(.data$item_id, .data$item_score, .data$rn) %>%
+        select('item_id', 'item_score', 'rn') %>%
         arrange(.data$rn) 
       
       m$est$beta = m$est$beta[items$rn, , drop=FALSE]

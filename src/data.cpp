@@ -1,5 +1,6 @@
-#include <RcppArmadillo.h>
 #include <stack>
+#include <RcppArmadillo.h>
+#include <omp.h>
 
 #define ALL 0
 #define LAST 1
@@ -584,3 +585,8 @@ bool is_connected_C( const IntegerMatrix& A)
 	return(true);
 }
 
+// [[Rcpp::export]]
+int omp_ncores()
+{
+	return omp_get_max_threads();
+}

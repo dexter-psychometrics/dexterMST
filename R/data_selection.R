@@ -319,7 +319,7 @@ unsafe_mst_data = function(db, qtpredicate,  env)
   bdes = bdes  %>% 
     inner_join(item_ms, by='item_id') %>%
     inner_join(bid_info$bid_tb, by=c('test_id','booklet_id')) %>%
-    select(old_bid='bid', .data$module_nbr, .data$item_id, .data$item_maxscore) %>%
+    select(old_bid='bid', 'module_nbr', 'item_id', 'item_maxscore') %>%
     mutate(old_bid=as.integer(.data$old_bid)) %>%
     inner_join(dsg$booklets_items, by=c('old_bid','item_id'))
   
@@ -375,7 +375,7 @@ unsafe_mst_data = function(db, qtpredicate,  env)
       }
     }) %>%
     ungroup() %>%
-    select(-.data$old_bid,-.data$mod_maxscore)
+    select(-'old_bid',-'mod_maxscore')
 
   bid_lev = routing %>%
     group_by(.data$bid, .data$test_id, .data$booklet_id) %>%

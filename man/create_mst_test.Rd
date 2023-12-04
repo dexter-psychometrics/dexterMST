@@ -49,7 +49,7 @@ to make sure your routing rules are valid and your data conform to them.
 }
 \examples{
 
-\dontshow{ RcppArmadillo::armadillo_throttle_cores(2)}
+\dontshow{ RcppArmadillo::armadillo_throttle_cores(1)}
 
 # extended example
 # we: 

@@ -2,8 +2,11 @@ context('profiles')
 library(dplyr)
 library(RSQLite)
 
+on_cran = function() !interactive() && !isTRUE(as.logical(Sys.getenv("NOT_CRAN", "false")))
 
 test_that('profiles match simulated rasch data', {
+  if(on_cran())
+    RcppArmadillo::armadillo_throttle_cores(1)
   set.seed(123)
   
   items = data.frame(item_id=sprintf("item%02i",1:70), item_score=1, delta=sort(runif(70,-1,1)))
@@ -90,4 +93,7 @@ test_that('profiles match simulated rasch data', {
   #plot(tst$expected_domain_score,tst$m,cex=200*tst$n/sum(tst$n),pch=19)  
   expect_lt(weighted.mean((tst$expected_domain_score-tst$m)^2,tst$n),.06)
   dbDisconnect(db)
+  
+  if(on_cran())
+    RcppArmadillo::armadillo_reset_cores()
 })

@@ -1,6 +1,6 @@
 #include <stack>
 #include <RcppArmadillo.h>
-#include <omp.h>
+#include "myomp.h"
 
 #define ALL 0
 #define LAST 1
@@ -84,7 +84,7 @@ IntegerVector bid_c(const std::vector<std::string>& test_id, const std::vector<s
 	for(int i=0; i<ll;i++)
 		bid[std::make_pair(test_lev[i], booklet_lev[i])] = i+1;
 	
-# pragma omp parallel for
+#pragma omp parallel for
 	for(int i=0; i<n; i++)
 	{
 		out[i] = bid[std::make_pair(test_id[i], booklet_id[i])];	
@@ -93,13 +93,14 @@ IntegerVector bid_c(const std::vector<std::string>& test_id, const std::vector<s
 	return out;
 }
 
+
 // [[Rcpp::export]]
-bool is_person_booklet_sorted(const IntegerVector& booklet_id, const IntegerVector& person_id)
+bool is_person_booklet_sorted(const IntegerVector& booklet_id, const IntegerVector& person_id, const int ncores)
 {
 	const int n = booklet_id.length();
 	std::atomic<bool> sorted(true);
-	// prefer parallel time worst case over fast return if not sorted
-#pragma omp parallel for
+
+#pragma omp parallel for num_threads(ncores)
 	for(int i=1; i<n; i++)
 	{
 		if((booklet_id[i] < booklet_id[i-1] && person_id[i] == person_id[i-1]) ||
@@ -108,7 +109,6 @@ bool is_person_booklet_sorted(const IntegerVector& booklet_id, const IntegerVect
 	}
 	return sorted;
 }
-
 
 
 // [[Rcpp::export]]

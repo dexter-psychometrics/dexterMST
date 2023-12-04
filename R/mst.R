@@ -334,7 +334,7 @@ alter_scoring_rules_mst = function(db, rules)
 #' 
 #' @examples
 #' 
-#' \dontshow{ RcppArmadillo::armadillo_throttle_cores(2)}
+#' \dontshow{ RcppArmadillo::armadillo_throttle_cores(1)}
 #' 
 #' # extended example
 #' # we: 

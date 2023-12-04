@@ -13,8 +13,8 @@ bid_c <- function(test_id, booklet_id, test_lev, booklet_lev) {
     .Call(`_dexterMST_bid_c`, test_id, booklet_id, test_lev, booklet_lev)
 }
 
-is_person_booklet_sorted <- function(booklet_id, person_id) {
-    .Call(`_dexterMST_is_person_booklet_sorted`, booklet_id, person_id)
+is_person_booklet_sorted <- function(booklet_id, person_id, ncores) {
+    .Call(`_dexterMST_is_person_booklet_sorted`, booklet_id, person_id, ncores)
 }
 
 mutate_booklet_score <- function(person_id, booklet_id, item_score) {

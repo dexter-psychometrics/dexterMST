@@ -89,7 +89,7 @@ get_sim_last = function()
 
 test_that('we can calibrate', {
   if(on_cran())
-    RcppArmadillo::armadillo_throttle_cores(2)
+    RcppArmadillo::armadillo_throttle_cores(1)
   
   all_db = get_sim_all()
   last_db = get_sim_last()

@@ -51,14 +51,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // is_person_booklet_sorted
-bool is_person_booklet_sorted(const IntegerVector& booklet_id, const IntegerVector& person_id);
-RcppExport SEXP _dexterMST_is_person_booklet_sorted(SEXP booklet_idSEXP, SEXP person_idSEXP) {
+bool is_person_booklet_sorted(const IntegerVector& booklet_id, const IntegerVector& person_id, const int ncores);
+RcppExport SEXP _dexterMST_is_person_booklet_sorted(SEXP booklet_idSEXP, SEXP person_idSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const IntegerVector& >::type booklet_id(booklet_idSEXP);
     Rcpp::traits::input_parameter< const IntegerVector& >::type person_id(person_idSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_person_booklet_sorted(booklet_id, person_id));
+    Rcpp::traits::input_parameter< const int >::type ncores(ncoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(is_person_booklet_sorted(booklet_id, person_id, ncores));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -318,7 +319,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dexterMST_fast_factor", (DL_FUNC) &_dexterMST_fast_factor, 2},
     {"_dexterMST_fast_factor_lev", (DL_FUNC) &_dexterMST_fast_factor_lev, 3},
     {"_dexterMST_bid_c", (DL_FUNC) &_dexterMST_bid_c, 4},
-    {"_dexterMST_is_person_booklet_sorted", (DL_FUNC) &_dexterMST_is_person_booklet_sorted, 2},
+    {"_dexterMST_is_person_booklet_sorted", (DL_FUNC) &_dexterMST_is_person_booklet_sorted, 3},
     {"_dexterMST_mutate_booklet_score", (DL_FUNC) &_dexterMST_mutate_booklet_score, 3},
     {"_dexterMST_make_booklets_unsafe", (DL_FUNC) &_dexterMST_make_booklets_unsafe, 8},
     {"_dexterMST_suf_stats_nrm_c", (DL_FUNC) &_dexterMST_suf_stats_nrm_c, 6},

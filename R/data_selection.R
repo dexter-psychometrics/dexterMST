@@ -10,6 +10,10 @@ ffactor = function (x, levels=NULL, as_int=FALSE)
   }
 }
 
+
+# to do: a function mst_data that takes design, routing_rules and data
+# saves the relevant (scored) tables in memory so that predicates can still be applied relatively easily
+
 # can/likely to return unused levels
 bid = function(respData, db)
 {
@@ -207,6 +211,7 @@ safe_mst_data = function(db, qtpredicate, env)
   # avoids all time consuming computations for mutilating routing rules, etc.
   
   columns = c('person_id', 'test_id', 'booklet_id', 'item_id', 'item_score')
+  ncores = get_cores()
   
   respData = get_rsp_data(db, qtpredicate=qtpredicate, env=env,
                           columns=columns,
@@ -223,7 +228,7 @@ safe_mst_data = function(db, qtpredicate, env)
   respData$test_id = NULL
   respData$booklet_id = NULL
   
-  if(!is_person_booklet_sorted(respData$bid, respData$person_id))
+  if(!is_person_booklet_sorted(respData$bid, respData$person_id, ncores))
     respData = arrange(respData, .data$person_id, .data$bid)
   
   respData$booklet_score = mutate_booklet_score(respData$person_id, respData$bid, respData$item_score)
@@ -259,6 +264,7 @@ unsafe_mst_data = function(db, qtpredicate,  env)
 {
  
   columns=c('person_id', 'test_id', 'booklet_id', 'module_nbr','item_id', 'item_score')
+  ncores = get_cores()
   
   respData = get_rsp_data(db, qtpredicate=qtpredicate, env=env,
                           columns=columns,
@@ -276,7 +282,7 @@ unsafe_mst_data = function(db, qtpredicate,  env)
   respData$test_id = NULL
   respData$booklet_id = NULL
   
-  if(!is_person_booklet_sorted(respData$bid, respData$person_id))
+  if(!is_person_booklet_sorted(respData$bid, respData$person_id, ncores))
     respData = arrange(respData, .data$person_id, .data$bid)
   
   respData$booklet_score = 0L

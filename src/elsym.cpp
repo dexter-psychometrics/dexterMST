@@ -1,5 +1,5 @@
 #include <RcppArmadillo.h>
-#include <omp.h>
+#include "myomp.h"
 
 #define ALL 0
 #define LAST 1

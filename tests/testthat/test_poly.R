@@ -9,7 +9,7 @@ on_cran = function() !interactive() && !isTRUE(as.logical(Sys.getenv("NOT_CRAN",
 
 test_that('discriminations', {
   if(on_cran())
-    RcppArmadillo::armadillo_throttle_cores(2)
+    RcppArmadillo::armadillo_throttle_cores(1)
   
   # set a seed for determinism in cran check
   # expect this check to succeed with > 99% of seeds
@@ -69,7 +69,7 @@ test_that('discriminations', {
 
 test_that('poly NR problem', {
   if(on_cran())
-    RcppArmadillo::armadillo_throttle_cores(2)
+    RcppArmadillo::armadillo_throttle_cores(1)
   
   db = start_new_project(verbAggrRules, ":memory:")
   add_booklet(db, verbAggrData, "agg")

@@ -1,1 +1,1 @@
-fix for Mac
+solves the unit test failure listed on https://cran.r-project.org/web/checks/check_results_dexterMST.html

@@ -367,7 +367,7 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 							const double prior_nu=0.1, const double prior_sigma=0)
 {
 
-	const bool free_calibration = all(fixed_b != fixed_b); // NA != NA
+	const bool free_calibration = all(fixed_b != fixed_b); // NA != NA to do: don't be smart, use arma function
 
 	const int nIter = ndraws * step + from;
 
@@ -454,11 +454,11 @@ arma::mat calibrate_Bayes(const arma::ivec& a, const arma::ivec& first, const ar
 			for(int ibnr = citnb[i]; ibnr<citnb[i+1]; ibnr++)
 			{
 				int k = itb[ibnr];
-			  for(int j=first[i], c=0; j<=last[i]; j++,c++)//for(int s=0; s<=bmax[k]-a[last[i]]; s++)
+				for(int j=first[i], c=0; j<=last[i]; j++,c++)//for(int s=0; s<=bmax[k]-a[last[i]]; s++)
 				{
-			    elsym(brouting[k], b, a,  bfirst.memptr() + cbnit[k], blast.memptr() + cbnit[k], bnit[k], 
-             mod_min.memptr() + cbmod[k], mod_max.memptr() + cbmod[k], nmod[k],
-             mnit.memptr() + cbmod[k], g, first[i],a[j]);
+					elsym(brouting[k], b, a,  bfirst.memptr() + cbnit[k], blast.memptr() + cbnit[k], bnit[k], 
+							mod_min.memptr() + cbmod[k], mod_max.memptr() + cbmod[k], nmod[k],
+							mnit.memptr() + cbmod[k], g, first[i],a[j]);
 					for(int s=0; s<=bmax[k]-a[last[i]]; s++)
 						y[c] += z[k] * g[s] * bklambda[cbmax[k]+s+a[j]];	
 				}

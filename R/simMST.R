@@ -16,7 +16,7 @@
 #' 
 #' 
 #' 
-sim_mst = function(pars, theta, test_design, routing_rules, routing=c('last','all'))
+sim_mst = function(pars, theta, test_design, routing_rules, routing=c('all','last'))
 {
   routing_type = match.arg(routing)
   dat = dexter::r_score(pars)(theta)

@@ -4,7 +4,7 @@
 \alias{sim_mst}
 \title{Simulate multistage testing data}
 \usage{
-sim_mst(pars, theta, test_design, routing_rules, routing = c("last", "all"))
+sim_mst(pars, theta, test_design, routing_rules, routing = c("all", "last"))
 }
 \arguments{
 \item{pars}{item parameters, can be either: 

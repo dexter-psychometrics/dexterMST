@@ -1,6 +1,10 @@
 
 # dexterMST 0.9.7
 
+* resubmission to cran after removal due to rsqlite test failures
+
+# dexterMST 0.9.7
+
 * fix for failing unit test due to inconsistent seed
 
 # dexterMST 0.9.6
